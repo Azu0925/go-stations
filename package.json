@@ -12,12 +12,7 @@
     "simple-git-hooks": "^2.5.1"
   },
   "scripts": {
-    "login:techtrain": "techtrain-railway login",
-    "hook:pre-commit": "techtrain-railway hook:pre-commit",
-    "hook:update": "simple-git-hooks",
-    "postinstall": "yarn hook:update && yarn login:techtrain"
+    "login:techtrain": "techtrain-railway login"
   },
-  "simple-git-hooks": {
-    "pre-commit": "yarn hook:pre-commit"
-  }
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
