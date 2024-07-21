@@ -5,17 +5,22 @@ import "time"
 type (
 	// A TODO expresses ...
 	TODO struct {
-		ID          int64     `json:"id",required`
-		Subject     string    `json:"subject",required`
-		Description string    `json:"descrption",required`
-		CreatedAt   time.Time `json:"created_at",required`
-		UpdatedAt   time.Time `json:"updated_at",required`
+		ID          int64     `json:"id",validate:"required"`
+		Subject     string    `json:"subject",validate:"required"`
+		Description string    `json:"descrption",validate:"required"`
+		CreatedAt   time.Time `json:"created_at",validate:"required"`
+		UpdatedAt   time.Time `json:"updated_at",validate:"required"`
 	}
 
 	// A CreateTODORequest expresses ...
-	CreateTODORequest struct{}
+	CreateTODORequest struct {
+		Subject     string `json:"subject"`
+		Description string `json:"description"`
+	}
 	// A CreateTODOResponse expresses ...
-	CreateTODOResponse struct{}
+	CreateTODOResponse struct {
+		TODO TODO `json:"todo"`
+	}
 
 	// A ReadTODORequest expresses ...
 	ReadTODORequest struct{}
