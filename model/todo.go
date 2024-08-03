@@ -28,9 +28,15 @@ type (
 	ReadTODOResponse struct{}
 
 	// A UpdateTODORequest expresses ...
-	UpdateTODORequest struct{}
+	UpdateTODORequest struct {
+		ID          int64  `json:"id" validate:"required"`
+		Subject     string `json:"subject" validate:"required"`
+		Description string `json:"description"`
+	}
 	// A UpdateTODOResponse expresses ...
-	UpdateTODOResponse struct{}
+	UpdateTODOResponse struct {
+		TODO TODO `json:"todo"`
+	}
 
 	// A DeleteTODORequest expresses ...
 	DeleteTODORequest struct{}
