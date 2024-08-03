@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 
@@ -28,7 +29,14 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
-		result, err := h.Create(ctx, &model.CreateTODORequest{})
+		var createTODORequest model.CreateTODORequest
+		params, err := parseReqBody(w, r, &createTODORequest)
+		if err != nil {
+			w.WriteHeader(400)
+			return
+		}
+
+		result, err := h.Create(ctx, params)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -43,7 +51,15 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "GET":
-		result, err := h.Read(ctx, &model.ReadTODORequest{})
+		var readTODORequest model.ReadTODORequest
+		params, err := parseReqBody(w, r, &readTODORequest)
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+
+		result, err := h.Read(ctx, params)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -57,7 +73,13 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case "PUT":
-		result, err := h.Update(ctx, &model.UpdateTODORequest{})
+		var updateTODORequest model.UpdateTODORequest
+		params, err := parseReqBody(w, r, &updateTODORequest)
+		if err != nil {
+			w.WriteHeader(400)
+			return
+		}
+		result, err := h.Update(ctx, params)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -71,7 +93,14 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case "DELETE":
-		result, err := h.Delete(ctx, &model.DeleteTODORequest{})
+		var deleteTODORequest model.DeleteTODORequest
+		params, err := parseReqBody(w, r, &deleteTODORequest)
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+		result, err := h.Delete(ctx, params)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -119,4 +148,20 @@ func (h *TODOHandler) Update(ctx context.Context, req *model.UpdateTODORequest) 
 func (h *TODOHandler) Delete(ctx context.Context, req *model.DeleteTODORequest) (*model.DeleteTODOResponse, error) {
 	_ = h.svc.DeleteTODO(ctx, nil)
 	return &model.DeleteTODOResponse{}, nil
+}
+
+func parseReqBody[T any](w http.ResponseWriter, r *http.Request, params *T) (*T, error) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	defer r.Body.Close()
+
+	err = json.Unmarshal(body, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return params, nil
 }
