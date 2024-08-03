@@ -2,6 +2,9 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
+	"log"
+	"net/http"
 
 	"github.com/TechBowl-japan/go-stations/model"
 	"github.com/TechBowl-japan/go-stations/service"
@@ -19,10 +22,85 @@ func NewTODOHandler(svc *service.TODOService) *TODOHandler {
 	}
 }
 
+func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	j := json.NewEncoder(w)
+
+	switch r.Method {
+	case "POST":
+		result, err := h.Create(ctx, &model.CreateTODORequest{})
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+
+		if err := j.Encode(result); err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+
+			return
+		}
+
+	case "GET":
+		result, err := h.Read(ctx, &model.ReadTODORequest{})
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+
+		if err := j.Encode(result); err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+
+			return
+		}
+	case "PUT":
+		result, err := h.Update(ctx, &model.UpdateTODORequest{})
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+
+		if err := j.Encode(result); err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+
+			return
+		}
+	case "DELETE":
+		result, err := h.Delete(ctx, &model.DeleteTODORequest{})
+		if err != nil {
+			w.WriteHeader(400)
+
+			return
+		}
+
+		if err := j.Encode(result); err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+
+			return
+		}
+	default:
+		w.WriteHeader(400)
+
+		return
+	}
+}
+
 // Create handles the endpoint that creates the TODO.
 func (h *TODOHandler) Create(ctx context.Context, req *model.CreateTODORequest) (*model.CreateTODOResponse, error) {
-	_, _ = h.svc.CreateTODO(ctx, "", "")
-	return &model.CreateTODOResponse{}, nil
+	result, err := h.svc.CreateTODO(ctx, req.Subject, req.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.CreateTODOResponse{
+		TODO: *result,
+	}, nil
 }
 
 // Read handles the endpoint that reads the TODOs.
