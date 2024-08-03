@@ -57,6 +57,8 @@ func realMain() error {
 		Handler: mux,
 	}
 
+	log.Printf("Start http://localhost%s", defaultPort)
+
 	server.ListenAndServe()
 
 	return nil
