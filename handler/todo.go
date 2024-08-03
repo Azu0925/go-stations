@@ -30,7 +30,7 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
 		var createTODORequest model.CreateTODORequest
-		params, err := parseReqBody(w, r, &createTODORequest)
+		params, err := parseReqBody(r, &createTODORequest)
 		if err != nil {
 			w.WriteHeader(400)
 			return
@@ -52,7 +52,7 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 		var readTODORequest model.ReadTODORequest
-		params, err := parseReqBody(w, r, &readTODORequest)
+		params, err := parseReqBody(r, &readTODORequest)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -74,7 +74,7 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case "PUT":
 		var updateTODORequest model.UpdateTODORequest
-		params, err := parseReqBody(w, r, &updateTODORequest)
+		params, err := parseReqBody(r, &updateTODORequest)
 		if err != nil {
 			w.WriteHeader(400)
 			return
@@ -94,7 +94,7 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case "DELETE":
 		var deleteTODORequest model.DeleteTODORequest
-		params, err := parseReqBody(w, r, &deleteTODORequest)
+		params, err := parseReqBody(r, &deleteTODORequest)
 		if err != nil {
 			w.WriteHeader(400)
 
@@ -150,7 +150,7 @@ func (h *TODOHandler) Delete(ctx context.Context, req *model.DeleteTODORequest) 
 	return &model.DeleteTODOResponse{}, nil
 }
 
-func parseReqBody[T any](w http.ResponseWriter, r *http.Request, params *T) (*T, error) {
+func parseReqBody[T any](r *http.Request, params *T) (*T, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
